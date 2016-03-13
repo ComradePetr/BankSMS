@@ -1,23 +1,12 @@
 package ru.spbau.banksms;
 
 import android.annotation.SuppressLint;
-import android.database.Cursor;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
-
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -47,65 +36,18 @@ public class GraphActivity extends AppCompatActivity {
     private View mControlsView;
     private boolean mVisible;
 
-    private SMSOpenHelper dbHelper;
+    private CardsOpenHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dbHelper = new SMSOpenHelper(this);
+        dbHelper = new CardsOpenHelper(this);
 
         setContentView(R.layout.activity_graph);
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.graph);
-
-
-        // Set up the user interaction to manually show or hide the system UI.
-/*        mContentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggle();
-            }
-        });*/
-
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
-        //findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
-
-        Cursor dbCursor = dbHelper.getAllSmsAsc();
-        if (dbCursor == null)
-            return;
-
-        ArrayList<DataPoint> lst = new ArrayList<>();
-        int lastMonth = -1, cntMonth = 0, sum = 0;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMM");
-        sdf.setTimeZone(TimeZone.getDefault());
-        while (dbCursor.moveToNext()) {
-            long date = dbCursor.getLong(1);
-            int delta = dbCursor.getInt(2);
-
-            int month = Integer.parseInt(sdf.format(new Date(date)));
-            if (month != lastMonth) {
-                if (lastMonth != -1) {
-                    lst.add(new DataPoint(cntMonth++, sum / 100.0));
-                    Log.d(TAG, String.format("%d: %.2f", cntMonth - 1, sum / 100.0));
-                }
-                sum = 0;
-            }
-            sum += delta;
-            lastMonth = month;
-        }
-        dbCursor.close();
-        if (sum != 0 && lastMonth != -1) {
-            lst.add(new DataPoint(cntMonth++, sum / 100.0));
-            Log.d(TAG, String.format("%d: %.2f", cntMonth - 1, sum / 100.0));
-        }
-
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(lst.toArray(new DataPoint[lst.size()]));
-        GraphView graph = (GraphView) findViewById(R.id.graph);
-        graph.addSeries(series);
     }
 
     @Override
